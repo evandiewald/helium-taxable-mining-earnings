@@ -67,7 +67,7 @@ df.to_csv(EXPORT_PATH)
 total_taxable_value_usd = np.sum(value_mined_usd)
 
 for i in range(len(hotspot_data['data'])):
-    if hotspot_data['data'][i]['address'] is MY_ADDRESS:
+    if hotspot_data['data'][i]['address'] is ACCOUNT_ADDRESS:
         print('The lat for this hotspot is: ', hotspot_data['data'][i]['lat'])
 
 print('\n\nTOTAL TAXABLE INCOME (USD) FOR 2021: ', str(total_taxable_value_usd))
