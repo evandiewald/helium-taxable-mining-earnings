@@ -1,4 +1,7 @@
 # helium-taxable-mining-earnings
+
+## Update 1-30-2021: Thanks to the positive response, I hacked together a site that will allow you to get this same functionality (with some minor improvements) without running the code yourself. You can access the site itself at http://heliumtaxtool.com or [the public repo here](https://github.com/evandiewald/helium-tax-tool-webpage).
+
 A brutally simple script for exporting a CSV of taxable earnings for a given account based on the USD/HNT price on Coingecko.
 ## ***Disclaimer**: This is not official tax advice - I have zero qualifications and take no responsibility for how you use this code. Use at your own risk and make sure to consult a tax professional.*
 
