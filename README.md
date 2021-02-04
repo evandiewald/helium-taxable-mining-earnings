@@ -1,6 +1,6 @@
 # helium-taxable-mining-earnings
 
-## Update 2-4-2021: Major updates to the code structure, now also just including the coingecko prices for each day in 2020 as a CSV to save calling the API every time for the same information. See new `examples.py` usage.
+## Update 2-4-2021: Major updates to the code structure, now also just including the coingecko prices for each day in 2020 as a CSV to save calling the API every time for the same information. See new [`examples.py`](examples.py) usage.
 
 ## Update 1-30-2021: Thanks to the positive response, I hacked together a site that will allow you to get this same functionality (with some minor improvements) without running the code yourself. You can access the site itself at http://heliumtaxtool.com or [the public repo here](https://github.com/evandiewald/helium-tax-tool-webpage).
 
@@ -28,6 +28,8 @@ Most exchanges and tax preparation software can help you handle the capital gain
 `pip install -r requirements.txt`
 4. Example usage (from [`examples.py`](examples.py):
 ```
+from Helium import export_wallet_taxes, export_hotspot_taxes
+
 ## Example 1: Exporting earnings for all hotspots in a given wallet
 # wallet that the hotspots are owned by
 ACCOUNT_ADDRESS = '14b7gkGPca2zyRCbUr1uuykiJwdtYnDhdZ3XBKgXocKQANrSavd'
