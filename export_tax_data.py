@@ -3,7 +3,8 @@ import pandas as pd
 from datetime import date, timedelta
 import numpy as np
 
-# working backwards from Dec. 31, 2020, how many days to check
+END_DATE = '2020-12-31'
+# working backwards from END_DATE, how many days to check
 N_DAYS = 365
 # your HNT address
 ACCOUNT_ADDRESS = 'PLACE_WALLET_ADDRESS_HERE'
@@ -20,7 +21,7 @@ hotspot_addresses = []
 for i in range(len(hotspot_data['data'])):
     hotspot_addresses.append(hotspot_data['data'][i]['address'])
 
-end_day = date.fromisoformat('2020-12-31')
+end_day = date.fromisoformat(END_DATE)
 day_list_iso = []
 for i in range(N_DAYS):
     day = end_day - timedelta(days=i)
@@ -66,4 +67,4 @@ df.to_csv(EXPORT_PATH)
 # summary
 total_taxable_value_usd = np.sum(value_mined_usd)
 
-print('\n\nTOTAL TAXABLE INCOME (USD) FOR 2021: ', str(total_taxable_value_usd))
+print(f"\nTOTAL TAXABLE INCOME (USD) FOR {END_DATE[:4]}: {total_taxable_value_usd}")
