@@ -1,5 +1,7 @@
 # helium-taxable-mining-earnings
 
+## Update 2-4-2021: Major updates to the code structure, now also just including the coingecko prices for each day in 2020 as a CSV to save calling the API every time for the same information. See new [`examples.py`](examples.py) usage.
+
 ## Update 1-30-2021: Thanks to the positive response, I hacked together a site that will allow you to get this same functionality (with some minor improvements) without running the code yourself. You can access the site itself at http://heliumtaxtool.com or [the public repo here](https://github.com/evandiewald/helium-tax-tool-webpage).
 
 A brutally simple script for exporting a CSV of taxable earnings for a given account based on the USD/HNT price on Coingecko.
@@ -24,7 +26,27 @@ Most exchanges and tax preparation software can help you handle the capital gain
 2. `cd` into the directory
 3. Install `requirements.txt`
 `pip install -r requirements.txt`
-4. Edit `export_tax_data.py` to include your HNT wallet address and N_DAYS parameter (if necessary).
-5. Run the script and find your exported data in `hnt_tax_data_2020.csv`
+4. Example usage (from [`examples.py`](examples.py):
+```
+from Helium import export_wallet_taxes, export_hotspot_taxes
+
+## Example 1: Exporting earnings for all hotspots in a given wallet
+# wallet that the hotspots are owned by
+ACCOUNT_ADDRESS = '14b7gkGPca2zyRCbUr1uuykiJwdtYnDhdZ3XBKgXocKQANrSavd'
+WALLET_EXPORT_PATH = 'account_earnings_2020.csv'
+
+wallet_earnings_df, total_wallet_earnings = export_wallet_taxes(ACCOUNT_ADDRESS)
+# export a CSV
+wallet_earnings_df.to_csv(WALLET_EXPORT_PATH)
+
+## Example 2: Exporting earnings for a single hotspot
+# hotspot address
+HOTSPOT_ADDRESS = '112X1p7bucmicDfr8jAausQYjbXPor2iFTkkko43HT7CS4ziR9kB'
+
+hotspot_earnings_df, total_hotspot_earnings, hotspot_name = export_hotspot_taxes(HOTSPOT_ADDRESS)
+# export
+hotspot_export_path = hotspot_name + '.csv'
+hotspot_earnings_df.to_csv(hotspot_export_path)
+```
 
 Like I said, nothing special, but if it saves someone a few minutes of coding then it's worth it. 
