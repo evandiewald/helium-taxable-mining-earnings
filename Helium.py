@@ -24,17 +24,7 @@ def export_wallet_taxes(account_address, year=2021):
     for i in range(len(hotspot_data['data'])):
         hotspot_addresses.append(hotspot_data['data'][i]['address'])
 
-    year_start_date = date.fromisoformat(f'{year}-01-01')
-    start_date = max(year_start_date, account_start_date)
-    end_day = date.fromisoformat(f'{year}-01-05')
-    n_days = end_day - start_date  # need to add one to include 1st day of the year
-    day_list_iso = []
-    for i in range(n_days.days + 1):
-        day = end_day - timedelta(days=i)
-        iso = day.isoformat()
-        day_list_iso.append(iso)
-
-    mined_by_day = get_mined_by_day(hotspot_addresses, day_list_iso)
+    day_list_iso, mined_by_day = get_mined_by_day(hotspot_addresses, year, account_start_date, hotspot_added_dates)
 
     hnt_price_usd = pd.read_csv(f'coingecko_prices_{year}.csv')['HNT_PRICE_USD']
     value_mined_usd = np.array(hnt_price_usd[:len(mined_by_day)]) * np.array(mined_by_day)
@@ -61,20 +51,7 @@ def export_hotspot_taxes(hotspot_address, year=2021):
     hotspot_address = hotspot_data['data']['address']
     hotspot_name = hotspot_data['data']['name']
 
-    # if the hotspot was added before the 1st of the year only check till that date.
-    year_start_date = date.fromisoformat(f'{year}-01-01')
-    start_date = max(year_start_date, hotspot_start_date)
-
-    end_day = date.fromisoformat(f'{year}-12-31')
-
-    n_days = end_day - start_date
-    day_list_iso = []
-    for i in range(n_days.days + 1):
-        day = end_day - timedelta(days=i)
-        iso = day.isoformat()
-        day_list_iso.append(iso)
-
-    mined_by_day = get_mined_by_day([hotspot_address], day_list_iso)
+    day_list_iso, mined_by_day = get_mined_by_day([hotspot_address], year, hotspot_start_date)
 
     hnt_price_usd = pd.read_csv(f'coingecko_prices_{year}.csv')['HNT_PRICE_USD']
     value_mined_usd = np.array(hnt_price_usd[:len(mined_by_day)]) * np.array(mined_by_day)
@@ -89,23 +66,35 @@ def export_hotspot_taxes(hotspot_address, year=2021):
     return df, total_taxable_value_usd, hotspot_name
 
 
-def get_mined_by_day(hotspot_addresses, day_list_iso):
+def get_mined_by_day(hotspot_addresses, year, start_date, hotspot_added_dates=[]):
+    year_start_date = date.fromisoformat(f'{year}-01-01')
+    start_date = max(year_start_date, start_date)
+    end_day = date.fromisoformat(f'{year + 1}-01-01')  # need the 1st day of new year in the day list to get every day
+    n_days = end_day - start_date
+    day_list_iso = []
+    for i in range(n_days.days + 1):
+        day = end_day - timedelta(days=i)
+        iso = day.isoformat()
+        day_list_iso.append(iso)
+
     mined_by_day = []
-    for j in range(len(day_list_iso)-1):
+    for j in range(len(day_list_iso) - 1):
         daily_total = 0
         for hotspot in hotspot_addresses:
             url = "https://api.helium.io/v1/hotspots/" + hotspot +\
                   "/rewards/sum?max_time=" + day_list_iso[j] + "&min_time=" +\
-                  day_list_iso[j+1]
+                  day_list_iso[j + 1]
             total = request_json(url)
             daily_total += total['data']['total']
 
         mined_by_day.append(daily_total)
 
         if np.remainder(j, 10) == 0:
-            print(day_list_iso[j])
+            print(day_list_iso[j + 1])
 
-    return mined_by_day
+    del day_list_iso[0]
+
+    return day_list_iso, mined_by_day
 
 
 def request_json(url, headers={}, payload={}):
