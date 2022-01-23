@@ -83,9 +83,10 @@ def export_hotspot_taxes(hotspot_address, year=2021):
     hotspot_address = hotspot_data['data']['address']
     hotspot_name = hotspot_data['data']['name']
 
+    hnt_price_usd = pd.read_csv(f'coingecko_prices_{year}.csv')['HNT_PRICE_USD']
     hotspot = MinedByDay([hotspot_address], year, hotspot_start_date)
     hotspot.get_data()
-    df = hotspot.calc_value()
+    df = hotspot.calc_value(hnt_price_usd)
 
     # summary
     total_taxable_value_usd = np.sum(hotspot.value_mined_usd)
