@@ -23,6 +23,7 @@ Most exchanges and tax preparation software can help you handle the capital gain
 3. Install `requirements.txt`
 `pip install -r requirements.txt`
 4. Example usage (from [`examples.py`](examples.py):
+* If you run into an API rate limit issue there is export_wallet_taxes_local but first you need to download the wallet data from fairspot https://www.fairspot.host/hnt-export-mining-tax
 ```
 from Helium import export_wallet_taxes, export_hotspot_taxes
 

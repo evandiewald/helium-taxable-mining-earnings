@@ -4,9 +4,12 @@ import pandas as pd
 import requests
 
 from datetime import date, timedelta
+from hntpy import Account, Hotspot, Validator
+
+BONES_PER_HNT = 100000000
 
 
-def export_wallet_taxes_by_hotspot(account_address, year=2021):
+def export_wallet_taxes_by_hotspot(account_address, year=2022):
     # your HNT address
     print('Collecting earnings data for account address: ', account_address)
 
@@ -37,23 +40,33 @@ def export_wallet_taxes_by_hotspot(account_address, year=2021):
     return dfs, total_taxable_value_usd
 
 
-def export_wallet_taxes(account_address, year=2021):
+def export_wallet_taxes(account_address, year=2022):
     # your HNT address
     print('Collecting earnings data for account address: ', account_address)
 
-    url = 'https://api.helium.io/v1/accounts/' + account_address + '/hotspots'
-    hotspot_data = request_json(url)
+    account = Account(address=account_address)
+    hotspot_data = account.hotspots()
+    # url = 'https://api.helium.io/v1/accounts/' + account_address + '/hotspots'
+    # hotspot_data = request_json(url)
 
     hotspot_added_dates = []
-    for i in range(len(hotspot_data['data'])):
-        date_added_iso = hotspot_data['data'][i]['timestamp_added'].split('T')[0]
+    for i in range(len(hotspot_data)):
+        date_added_iso = hotspot_data[i]['timestamp_added'].split('T')[0]
         date_added_ts = date.fromisoformat(date_added_iso)
         hotspot_added_dates.append(date_added_ts)
     account_start_date = min(hotspot_added_dates)
 
     hotspot_addresses = []
-    for i in range(len(hotspot_data['data'])):
-        hotspot_addresses.append(hotspot_data['data'][i]['address'])
+    for i in range(len(hotspot_data)):
+        # hotspot_addresses.append(hotspot_data[i]['address'])
+        address = hotspot_data[i]['address']
+
+        # fix for extra char in address
+        len_address = len(address)
+        if len_address == 52:
+            address = address[1:]
+
+        hotspot_addresses.append(Hotspot(address))
 
     hotspots = MinedByDay(hotspot_addresses, year, account_start_date)
     day_list_iso, mined_by_day = hotspots.get_data()
@@ -71,7 +84,7 @@ def export_wallet_taxes(account_address, year=2021):
     return df, total_taxable_value_usd
 
 
-def export_hotspot_taxes(hotspot_address, year=2021):
+def export_hotspot_taxes(hotspot_address, year=2022):
     # your hotspot address
     print('Collecting earnings data for hotspot address: ', hotspot_address)
 
@@ -121,11 +134,15 @@ class MinedByDay:
         for j in range(len(day_list_iso) - 1):
             daily_total = 0
             for hotspot in self.hotspot_addresses:
-                url = "https://api.helium.io/v1/hotspots/" + hotspot +\
-                      "/rewards/sum?max_time=" + day_list_iso[j] + "&min_time=" +\
-                      day_list_iso[j + 1]
-                total = request_json(url)
-                daily_total += total['data']['total']
+                # url = "https://api.helium.io/v1/hotspots/" + hotspot +\
+                #       "/rewards/sum?max_time=" + day_list_iso[j] + "&min_time=" +\
+                #       day_list_iso[j + 1]
+                # total = request_json(url)
+                hotspot_total = 0
+                hotspot_rewards = hotspot.rewards(min_time=day_list_iso[j + 1], max_time=day_list_iso[j], gen=False)
+                for reward in hotspot_rewards:
+                    hotspot_total += reward['amount'] / BONES_PER_HNT  # convert bones to HNT
+                daily_total += hotspot_total
 
             mined_by_day.append(daily_total)
 

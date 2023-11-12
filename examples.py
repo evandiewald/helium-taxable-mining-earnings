@@ -1,4 +1,5 @@
 from Helium import export_wallet_taxes, export_wallet_taxes_by_hotspot, export_hotspot_taxes
+from helium_local import export_wallet_taxes as export_wallet_taxes_local
 
 # the functions in Helium.py give you three options for exporting earnings data:
 #   1) export_wallet_taxes scrapes the data for all hotspots attached to your HNT wallet
@@ -14,9 +15,9 @@ from Helium import export_wallet_taxes, export_wallet_taxes_by_hotspot, export_h
 
 # Example 1: Exporting earnings for all hotspots in a given wallet
 ACCOUNT_ADDRESS = 'ae9iurqijoaFAKEADDRESSsdfiojewroijssn'  # wallet that the hotspots are owned by
-WALLET_EXPORT_PATH = 'account_earnings_2021.csv'
+WALLET_EXPORT_PATH = 'account_earnings_2022.csv'
 
-wallet_earnings_df, total_wallet_earnings = export_wallet_taxes(ACCOUNT_ADDRESS)
+wallet_earnings_df, total_wallet_earnings = export_wallet_taxes(ACCOUNT_ADDRESS, year=2022)
 # export a CSV
 wallet_earnings_df.to_csv(WALLET_EXPORT_PATH)
 
@@ -33,3 +34,12 @@ hotspot_earnings_df, total_hotspot_earnings, hotspot_name = export_hotspot_taxes
 # export
 hotspot_export_path = hotspot_name + '.csv'
 hotspot_earnings_df.to_csv(hotspot_export_path)
+
+# Example 4: local wallet data
+year = 2022
+address = "WALLET_ADDRESS"
+fairspot_raw = fr"{year}\helium-{address}-{year}-raw.csv"
+WALLET_EXPORT_PATH = f"helium-{address}-{year}-earnings.csv"
+wallet_earnings_df, total_wallet_earnings = export_wallet_taxes_local(fairspot_raw, year=2022)
+# export a CSV
+wallet_earnings_df.to_csv(WALLET_EXPORT_PATH)
